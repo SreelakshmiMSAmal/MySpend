@@ -10,6 +10,7 @@ import com.sreelakshmims.myspend.data.local.dao.ExpenseDao
 import com.sreelakshmims.myspend.data.local.dao.PaymentMethodDao
 import com.sreelakshmims.myspend.data.local.entity.CategoryEntity
 import com.sreelakshmims.myspend.data.local.entity.PaymentMethodEntity
+import com.sreelakshmims.myspend.domain.model.NecessityLevel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,7 +38,7 @@ object DatabaseModule {
             MySpendDatabase::class.java,
             MySpendDatabase.DATABASE_NAME
         )
-            .addMigrations(MySpendDatabase.MIGRATION_1_2)
+            .addMigrations(MySpendDatabase.MIGRATION_1_2, MySpendDatabase.MIGRATION_2_3)
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
@@ -51,14 +52,42 @@ object DatabaseModule {
     }
 
     private suspend fun prepopulateCategories(dao: CategoryDao) {
-        val categories = listOf(
-            "Food", "Groceries", "Transport", "Shopping", "Bills",
-            "Rent", "Health", "Entertainment", "Education", "Travel",
-            "Subscriptions", "Personal", "Others",
-            "EMI", "Savings", "Insurance", "Parents", "Charity",
-            "Home Maintenance", "Professional", "Fuel & Vehicle", "Gifts & Celebrations"
-        ).map { CategoryEntity(name = it, isDefault = true) }
+        val categories = getInitialCategories()
         categories.forEach { dao.insertCategory(it) }
+    }
+
+    fun getInitialCategories(): List<CategoryEntity> {
+        return listOf(
+            // NECESSITY
+            CategoryEntity(name = "EMI", necessity = NecessityLevel.NECESSITY, isDefault = true),
+            CategoryEntity(name = "Fuel & Vehicle", necessity = NecessityLevel.NECESSITY, isDefault = true),
+            CategoryEntity(name = "Parents", necessity = NecessityLevel.NECESSITY, isDefault = true),
+            CategoryEntity(name = "Insurance", necessity = NecessityLevel.NECESSITY, isDefault = true),
+            CategoryEntity(name = "Food", necessity = NecessityLevel.NECESSITY, isDefault = true),
+            CategoryEntity(name = "Groceries", necessity = NecessityLevel.NECESSITY, isDefault = true),
+            CategoryEntity(name = "Transport", necessity = NecessityLevel.NECESSITY, isDefault = true),
+            CategoryEntity(name = "Rent", necessity = NecessityLevel.NECESSITY, isDefault = true),
+            CategoryEntity(name = "Bills", necessity = NecessityLevel.NECESSITY, isDefault = true),
+
+            // SEMI_NECESSITY
+            CategoryEntity(name = "Home Maintenance", necessity = NecessityLevel.SEMI_NECESSITY, isDefault = true),
+            CategoryEntity(name = "Professional", necessity = NecessityLevel.SEMI_NECESSITY, isDefault = true),
+            CategoryEntity(name = "Health", necessity = NecessityLevel.SEMI_NECESSITY, isDefault = true),
+            CategoryEntity(name = "Education", necessity = NecessityLevel.SEMI_NECESSITY, isDefault = true),
+
+            // SAVINGS
+            CategoryEntity(name = "Savings", necessity = NecessityLevel.SAVINGS, isDefault = true),
+
+            // NOT_NECESSARY
+            CategoryEntity(name = "Gifts & Celebrations", necessity = NecessityLevel.NOT_NECESSARY, isDefault = true),
+            CategoryEntity(name = "Charity", necessity = NecessityLevel.NOT_NECESSARY, isDefault = true),
+            CategoryEntity(name = "Shopping", necessity = NecessityLevel.NOT_NECESSARY, isDefault = true),
+            CategoryEntity(name = "Entertainment", necessity = NecessityLevel.NOT_NECESSARY, isDefault = true),
+            CategoryEntity(name = "Subscriptions", necessity = NecessityLevel.NOT_NECESSARY, isDefault = true),
+            CategoryEntity(name = "Travel", necessity = NecessityLevel.NOT_NECESSARY, isDefault = true),
+            CategoryEntity(name = "Personal", necessity = NecessityLevel.NOT_NECESSARY, isDefault = true),
+            CategoryEntity(name = "Others", necessity = NecessityLevel.NOT_NECESSARY, isDefault = true)
+        )
     }
 
     private suspend fun prepopulatePaymentMethods(dao: PaymentMethodDao) {

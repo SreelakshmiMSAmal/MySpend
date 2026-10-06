@@ -10,6 +10,7 @@ import com.sreelakshmims.myspend.data.toExpense
 import com.sreelakshmims.myspend.data.toPaymentMethod
 import com.sreelakshmims.myspend.domain.model.CategorySummary
 import com.sreelakshmims.myspend.domain.model.Expense
+import com.sreelakshmims.myspend.domain.model.NecessitySummary
 import com.sreelakshmims.myspend.domain.model.PaymentMethodSummary
 import com.sreelakshmims.myspend.domain.repository.ExpenseRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -106,6 +107,12 @@ class ExpenseRepositoryImpl @Inject constructor(
                     } else null
                 }
             }
+        }
+    }
+
+    override fun getNecessitySummariesBetweenDates(startDate: Long, endDate: Long): Flow<List<NecessitySummary>> {
+        return expenseDao.getNecessityTotalsBetweenDates(startDate, endDate).map { totals ->
+            totals.map { NecessitySummary(it.necessity, it.totalAmount) }
         }
     }
 

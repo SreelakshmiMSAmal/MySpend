@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.sreelakshmims.myspend.data.local.dao.DailySpendingPoint
 import com.sreelakshmims.myspend.domain.model.CategorySummary
 import com.sreelakshmims.myspend.domain.model.Expense
+import com.sreelakshmims.myspend.domain.model.NecessitySummary
 import com.sreelakshmims.myspend.domain.model.PaymentMethodSummary
 import com.sreelakshmims.myspend.domain.repository.ExpenseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,7 +46,8 @@ class AnalyticsViewModel @Inject constructor(
             expenseRepository.getPaymentMethodSummariesBetweenDates(startTime, endTime),
             expenseRepository.getDailySpendingTrend(startTime, endTime),
             expenseRepository.getTotalSpentBetweenDates(prevStartTime, prevEndTime),
-            expenseRepository.getExpensesBetweenDates(startTime, endTime)
+            expenseRepository.getExpensesBetweenDates(startTime, endTime),
+            expenseRepository.getNecessitySummariesBetweenDates(startTime, endTime)
         ) { args ->
             val total = args[0] as Long
             val categories = args[1] as List<CategorySummary>
@@ -53,6 +55,7 @@ class AnalyticsViewModel @Inject constructor(
             val trend = args[3] as List<DailySpendingPoint>
             val prevTotal = args[4] as Long
             val expenses = args[5] as List<Expense>
+            val necessitySummaries = args[6] as List<NecessitySummary>
 
             val highestDay = trend.maxByOrNull { it.totalAmount }
             val insights = mutableListOf<SpendingInsight>()
@@ -89,6 +92,7 @@ class AnalyticsViewModel @Inject constructor(
                 previousMonthTotal = prevTotal,
                 categorySummaries = categories,
                 paymentMethodSummaries = methods,
+                necessitySummaries = necessitySummaries,
                 dailyTrend = trend,
                 transactionCount = expenses.size,
                 highestDayAmount = highestDay?.totalAmount ?: 0L,

@@ -5,5 +5,6 @@ data class Category(
     val name: String,
     val icon: String? = null,
     val color: String? = null,
-    val isDefault: Boolean = false
+    val isDefault: Boolean = false,
+    val necessity: NecessityLevel = NecessityLevel.NECESSITY
 )

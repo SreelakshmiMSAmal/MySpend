@@ -1,5 +1,8 @@
 package com.sreelakshmims.myspend.presentation.analytics
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,6 +44,8 @@ import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.sreelakshmims.myspend.domain.model.CategorySummary
+import com.sreelakshmims.myspend.domain.model.NecessityLevel
+import com.sreelakshmims.myspend.domain.model.NecessitySummary
 import com.sreelakshmims.myspend.util.CurrencyUtils
 import com.sreelakshmims.myspend.util.getCategoryStyle
 import java.text.DateFormatSymbols
@@ -104,6 +109,10 @@ fun AnalyticsScreen(
 
             item {
                 SpendingTrendChart(uiState)
+            }
+
+            item {
+                NecessityBreakdownCard(uiState)
             }
 
             item {
@@ -667,6 +676,188 @@ fun getPaymentMethodColor(name: String): Color {
         "Bank Transfer" -> Color(0xFF4CAF50)
         "Net Banking" -> Color(0xFFE91E63)
         else -> Color(0xFF455A64)
+    }
+}
+
+@Composable
+fun NecessityBreakdownCard(state: AnalyticsUiState) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        border = CardDefaults.outlinedCardBorder()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column {
+                    Text(
+                        "Spending by Necessity Level",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        "Breakdown by necessity tier",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Gray
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Surface(
+                    color = Color.LightGray.copy(alpha = 0.3f),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text(
+                        DateFormatSymbols().shortMonths[state.selectedMonth],
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            }
+
+            NecessityDonutChart(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp),
+                summaries = state.necessitySummaries,
+                totalAmount = state.totalSpent
+            )
+
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                val allLevels = listOf(
+                    NecessityLevel.NECESSITY,
+                    NecessityLevel.SEMI_NECESSITY,
+                    NecessityLevel.SAVINGS,
+                    NecessityLevel.NOT_NECESSARY
+                )
+
+                allLevels.forEach { level ->
+                    val (label, color) = getNecessityInfo(level)
+                    val summary = state.necessitySummaries.find { it.necessity == level }
+                    val amount = summary?.totalAmountPaise ?: 0L
+                    val percentage = if (state.totalSpent > 0) {
+                        (amount.toFloat() / state.totalSpent * 100)
+                    } else 0f
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(12.dp)
+                                    .clip(CircleShape)
+                                    .background(color)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = label,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = CurrencyUtils.formatPaiseToRupees(amount),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "(%.1f%%)".format(percentage),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun NecessityDonutChart(
+    modifier: Modifier = Modifier,
+    summaries: List<NecessitySummary>,
+    totalAmount: Long
+) {
+    val emptyColor = MaterialTheme.colorScheme.outlineVariant
+    val animProgress = remember { Animatable(0f) }
+
+    LaunchedEffect(summaries) {
+        animProgress.snapTo(0f)
+        animProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = 1000,
+                easing = FastOutSlowInEasing
+            )
+        )
+    }
+
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        Canvas(modifier = Modifier.size(160.dp)) {
+            val strokeWidth = 36f
+            val arcSize = Size(size.width - strokeWidth, size.height - strokeWidth)
+            val topLeft = Offset(strokeWidth / 2, strokeWidth / 2)
+
+            val total = summaries.sumOf { it.totalAmountPaise }.toFloat()
+
+            if (total <= 0f) {
+                drawArc(
+                    color = emptyColor,
+                    startAngle = 0f,
+                    sweepAngle = 360f,
+                    useCenter = false,
+                    topLeft = topLeft,
+                    size = arcSize,
+                    style = Stroke(width = strokeWidth)
+                )
+                return@Canvas
+            }
+
+            val gap = if (summaries.filter { it.totalAmountPaise > 0 }.size > 1) 3f else 0f
+            var startAngle = -90f
+
+            summaries.filter { it.totalAmountPaise > 0 }.forEach { summary ->
+                val sweep = (summary.totalAmountPaise.toFloat() / total * 360f) * animProgress.value
+                val (_, color) = getNecessityInfo(summary.necessity)
+
+                drawArc(
+                    color = color,
+                    startAngle = startAngle,
+                    sweepAngle = (sweep - gap).coerceAtLeast(0.1f),
+                    useCenter = false,
+                    topLeft = topLeft,
+                    size = arcSize,
+                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                )
+                startAngle += (summary.totalAmountPaise.toFloat() / total * 360f)
+            }
+        }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = CurrencyUtils.formatPaiseToRupees(totalAmount),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text("Total Spend", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+        }
+    }
+}
+
+fun getNecessityInfo(level: NecessityLevel): Pair<String, Color> {
+    return when (level) {
+        NecessityLevel.NECESSITY -> Pair("Necessity", Color(0xFF2563EB)) // Deep Blue
+        NecessityLevel.SEMI_NECESSITY -> Pair("Semi-Necessity", Color(0xFFF59E0B)) // Warm Amber
+        NecessityLevel.SAVINGS -> Pair("Savings", Color(0xFF10B981)) // Emerald Green
+        NecessityLevel.NOT_NECESSARY -> Pair("Not Necessary", Color(0xFFEF4444)) // Coral Red
     }
 }
 

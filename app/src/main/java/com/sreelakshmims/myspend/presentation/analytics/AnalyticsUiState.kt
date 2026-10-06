@@ -2,6 +2,7 @@ package com.sreelakshmims.myspend.presentation.analytics
 
 import com.sreelakshmims.myspend.data.local.dao.DailySpendingPoint
 import com.sreelakshmims.myspend.domain.model.CategorySummary
+import com.sreelakshmims.myspend.domain.model.NecessitySummary
 import com.sreelakshmims.myspend.domain.model.PaymentMethodSummary
 import java.util.Calendar
 
@@ -13,6 +14,7 @@ data class AnalyticsUiState(
     val monthlyLimit: Long = 3000000, // Default 30,000 paise * 100 = 30,000.00? No, paise is cent. 30,000 Rs = 3,000,000 paise.
     val categorySummaries: List<CategorySummary> = emptyList(),
     val paymentMethodSummaries: List<PaymentMethodSummary> = emptyList(),
+    val necessitySummaries: List<NecessitySummary> = emptyList(),
     val dailyTrend: List<DailySpendingPoint> = emptyList(),
     val transactionCount: Int = 0,
     val highestDayAmount: Long = 0,

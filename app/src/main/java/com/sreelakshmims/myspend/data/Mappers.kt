@@ -8,11 +8,11 @@ import com.sreelakshmims.myspend.domain.model.Expense
 import com.sreelakshmims.myspend.domain.model.PaymentMethod
 
 fun CategoryEntity.toCategory(): Category {
-    return Category(id, name, icon, color, isDefault)
+    return Category(id, name, icon, color, isDefault, necessity)
 }
 
 fun Category.toEntity(): CategoryEntity {
-    return CategoryEntity(id, name, icon, color, isDefault)
+    return CategoryEntity(id, name, icon, color, isDefault, necessity)
 }
 
 fun PaymentMethodEntity.toPaymentMethod(): PaymentMethod {
