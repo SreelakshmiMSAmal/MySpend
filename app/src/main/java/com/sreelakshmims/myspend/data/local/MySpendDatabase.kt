@@ -2,6 +2,8 @@ package com.sreelakshmims.myspend.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.sreelakshmims.myspend.data.local.dao.CategoryDao
 import com.sreelakshmims.myspend.data.local.dao.ExpenseDao
 import com.sreelakshmims.myspend.data.local.dao.PaymentMethodDao
@@ -15,7 +17,7 @@ import com.sreelakshmims.myspend.data.local.entity.PaymentMethodEntity
         CategoryEntity::class,
         PaymentMethodEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class MySpendDatabase : RoomDatabase() {
@@ -25,5 +27,26 @@ abstract class MySpendDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "myspend_db"
+
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                val newCategories = listOf(
+                    "EMI",
+                    "Savings",
+                    "Insurance",
+                    "Parents",
+                    "Charity",
+                    "Home Maintenance",
+                    "Professional",
+                    "Fuel & Vehicle",
+                    "Gifts & Celebrations"
+                )
+                for (category in newCategories) {
+                    db.execSQL(
+                        "INSERT OR IGNORE INTO categories (name, isDefault) VALUES ('$category', 1)"
+                    )
+                }
+            }
+        }
     }
 }

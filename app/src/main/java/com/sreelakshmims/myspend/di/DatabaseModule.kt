@@ -36,22 +36,27 @@ object DatabaseModule {
             context,
             MySpendDatabase::class.java,
             MySpendDatabase.DATABASE_NAME
-        ).addCallback(object : RoomDatabase.Callback() {
-            override fun onCreate(db: SupportSQLiteDatabase) {
-                super.onCreate(db)
-                CoroutineScope(Dispatchers.IO).launch {
-                    prepopulateCategories(categoryDaoProvider.get())
-                    prepopulatePaymentMethods(paymentMethodDaoProvider.get())
+        )
+            .addMigrations(MySpendDatabase.MIGRATION_1_2)
+            .addCallback(object : RoomDatabase.Callback() {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        prepopulateCategories(categoryDaoProvider.get())
+                        prepopulatePaymentMethods(paymentMethodDaoProvider.get())
+                    }
                 }
-            }
-        }).build()
+            })
+            .build()
     }
 
     private suspend fun prepopulateCategories(dao: CategoryDao) {
         val categories = listOf(
             "Food", "Groceries", "Transport", "Shopping", "Bills",
             "Rent", "Health", "Entertainment", "Education", "Travel",
-            "Subscriptions", "Personal", "Others"
+            "Subscriptions", "Personal", "Others",
+            "EMI", "Savings", "Insurance", "Parents", "Charity",
+            "Home Maintenance", "Professional", "Fuel & Vehicle", "Gifts & Celebrations"
         ).map { CategoryEntity(name = it, isDefault = true) }
         categories.forEach { dao.insertCategory(it) }
     }

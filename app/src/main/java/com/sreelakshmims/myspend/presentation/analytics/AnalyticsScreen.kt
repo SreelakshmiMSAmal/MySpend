@@ -657,22 +657,6 @@ fun SmartSpendingInsights(state: AnalyticsUiState) {
     }
 }
 
-fun getCategoryColor(name: String): Color {
-    return when (name) {
-        "Food" -> Color(0xFF61E006)
-        "Groceries" -> Color(0xFFF5CC0B)
-        "Shopping" -> Color(0xFFCC0101)
-        "Transport" -> Color(0xFF6E2402)
-        "Bills" -> Color(0xFFE761AB)
-        "Rent" -> Color(0xFFA60AC0)
-        "Health" -> Color(0xFF1774E5)
-        "Entertainment" -> Color(0xFF0CE7CD)
-        "Subscriptions" -> Color(0xFFD96106)
-        "Personal" -> Color(0xFF0A24D3)
-        "Travel" -> Color(0xFF673AB7)
-        else -> Color(0xFF90A4AE)
-    }
-}
 
 fun getPaymentMethodColor(name: String): Color {
     return when (name) {
