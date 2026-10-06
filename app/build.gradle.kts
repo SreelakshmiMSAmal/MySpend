@@ -10,7 +10,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.sreelakshmims.myspend"
+        applicationId = "com.instagram.android"
         minSdk = 26
         targetSdk = 37
         versionCode = 1
@@ -28,12 +28,23 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
         compose = true
+    }
+}
+
+androidComponents {
+    onVariants { variant ->
+        val appName = "MySpend"
+        val version = android.defaultConfig.versionName ?: "1.0"
+        variant.outputs.forEach { output ->
+            output.outputFileName.set("$appName-v$version-${variant.name}.apk")
+        }
     }
 }
 

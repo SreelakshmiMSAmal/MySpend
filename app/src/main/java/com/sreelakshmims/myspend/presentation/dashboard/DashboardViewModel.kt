@@ -27,33 +27,68 @@ class DashboardViewModel @Inject constructor(
     }
 
     private fun loadDashboardData() {
-        val calendar = Calendar.getInstance()
-        
-        // Today
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        val startOfToday = calendar.timeInMillis
-        val endOfToday = startOfToday + 86400000 - 1
+        // Today range: 00:00:00.000 to 23:59:59.999 of today
+        val calTodayStart = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val startOfToday = calTodayStart.timeInMillis
 
-        // This Week
-        calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
-        val startOfWeek = calendar.timeInMillis
-        val endOfWeek = System.currentTimeMillis()
+        val calTodayEnd = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }
+        val endOfToday = calTodayEnd.timeInMillis
 
-        // This Month
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        val startOfMonth = calendar.timeInMillis
-        val endOfMonth = System.currentTimeMillis()
-        
+        // This Week range: start of first day of week to end of current week
+        val calWeekStart = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+            set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
+        }
+        val startOfWeek = calWeekStart.timeInMillis
+
+        val calWeekEnd = (calWeekStart.clone() as Calendar).apply {
+            add(Calendar.DAY_OF_WEEK, 6)
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }
+        val endOfWeek = calWeekEnd.timeInMillis
+
+        // This Month range: 1st day 00:00:00.000 to last day 23:59:59.999 of current month
+        val calMonthStart = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val startOfMonth = calMonthStart.timeInMillis
+
+        val calMonthEnd = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }
+        val endOfMonth = calMonthEnd.timeInMillis
+
         val daysInMonthPassed = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
 
         combine(
             expenseRepository.getTotalSpentBetweenDates(startOfToday, endOfToday),
             expenseRepository.getTotalSpentBetweenDates(startOfWeek, endOfWeek),
             expenseRepository.getTotalSpentBetweenDates(startOfMonth, endOfMonth),
-            expenseRepository.getAllExpenses() // We could limit this in repo if needed
+            expenseRepository.getAllExpenses()
         ) { today, week, month, allExpenses ->
             DashboardUiState(
                 spentToday = today,
