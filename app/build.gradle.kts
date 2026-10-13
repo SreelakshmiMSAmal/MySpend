@@ -10,7 +10,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.reelakshmims.myspend"
+        applicationId = "com.sreelakshmims.myspend"
         minSdk = 26
         targetSdk = 37
         versionCode = 2
