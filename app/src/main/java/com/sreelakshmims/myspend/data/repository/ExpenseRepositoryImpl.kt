@@ -84,6 +84,10 @@ class ExpenseRepositoryImpl @Inject constructor(
         return expenseDao.getTotalSpentBetweenDates(startDate, endDate).map { it ?: 0L }
     }
 
+    override fun getTotalSpentWOSavings(startDate: Long, endDate: Long): Flow<Long> {
+        return expenseDao.getTotalExpenseBetweenDays(startDate, endDate).map { it ?: 0L }
+    }
+
     override fun getCategorySummariesBetweenDates(startDate: Long, endDate: Long): Flow<List<CategorySummary>> {
         return expenseDao.getCategoryTotalsBetweenDates(startDate, endDate).flatMapLatest { totals ->
             categoryDao.getAllCategories().map { categories ->

@@ -25,6 +25,9 @@ interface ExpenseDao {
     @Query("SELECT * FROM expenses WHERE expenseDate BETWEEN :startDate AND :endDate ORDER BY expenseDate DESC")
     fun getExpensesBetweenDates(startDate: Long, endDate: Long): Flow<List<ExpenseEntity>>
 
+    @Query("SELECT SUM(amountPaise) FROM expenses e INNER join categories c on e.categoryId = c.id WHERE expenseDate BETWEEN :startDate AND :endDate  AND c.necessity != 'SAVINGS' ")
+    fun getTotalExpenseBetweenDays(startDate: Long, endDate: Long): Flow<Long?>
+
     @Query("SELECT SUM(amountPaise) FROM expenses WHERE expenseDate BETWEEN :startDate AND :endDate")
     fun getTotalSpentBetweenDates(startDate: Long, endDate: Long): Flow<Long?>
 

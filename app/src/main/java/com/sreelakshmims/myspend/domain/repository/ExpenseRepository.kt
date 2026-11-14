@@ -15,6 +15,7 @@ interface ExpenseRepository {
     fun getAllExpenses(): Flow<List<Expense>>
     fun getExpensesBetweenDates(startDate: Long, endDate: Long): Flow<List<Expense>>
     fun getTotalSpentBetweenDates(startDate: Long, endDate: Long): Flow<Long>
+    fun getTotalSpentWOSavings(startDate: Long, endDate: Long): Flow<Long>
     fun getCategorySummariesBetweenDates(startDate: Long, endDate: Long): Flow<List<CategorySummary>>
     fun getPaymentMethodSummariesBetweenDates(startDate: Long, endDate: Long): Flow<List<PaymentMethodSummary>>
     fun getNecessitySummariesBetweenDates(startDate: Long, endDate: Long): Flow<List<NecessitySummary>>

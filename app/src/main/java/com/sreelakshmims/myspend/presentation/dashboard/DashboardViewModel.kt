@@ -85,9 +85,9 @@ class DashboardViewModel @Inject constructor(
         val daysInMonthPassed = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
 
         combine(
-            expenseRepository.getTotalSpentBetweenDates(startOfToday, endOfToday),
-            expenseRepository.getTotalSpentBetweenDates(startOfWeek, endOfWeek),
-            expenseRepository.getTotalSpentBetweenDates(startOfMonth, endOfMonth),
+            expenseRepository.getTotalSpentWOSavings(startOfToday, endOfToday),
+            expenseRepository.getTotalSpentWOSavings(startOfWeek, endOfWeek),
+            expenseRepository.getTotalSpentWOSavings(startOfMonth, endOfMonth),
             expenseRepository.getAllExpenses()
         ) { today, week, month, allExpenses ->
             DashboardUiState(
