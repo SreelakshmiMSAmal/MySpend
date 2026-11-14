@@ -41,11 +41,11 @@ class AnalyticsViewModel @Inject constructor(
         val (prevStartTime, prevEndTime) = getPreviousDateRange(month, year, periodType)
 
         combine(
-            expenseRepository.getTotalSpentBetweenDates(startTime, endTime),
+            expenseRepository.getTotalSpentWOSavings(startTime, endTime),
             expenseRepository.getCategorySummariesBetweenDates(startTime, endTime),
             expenseRepository.getPaymentMethodSummariesBetweenDates(startTime, endTime),
             expenseRepository.getDailySpendingTrend(startTime, endTime),
-            expenseRepository.getTotalSpentBetweenDates(prevStartTime, prevEndTime),
+            expenseRepository.getTotalSpentWOSavings(prevStartTime, prevEndTime),
             expenseRepository.getExpensesBetweenDates(startTime, endTime),
             expenseRepository.getNecessitySummariesBetweenDates(startTime, endTime)
         ) { args ->
