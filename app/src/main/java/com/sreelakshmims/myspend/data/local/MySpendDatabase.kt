@@ -18,7 +18,7 @@ import com.sreelakshmims.myspend.data.local.entity.PaymentMethodEntity
         CategoryEntity::class,
         PaymentMethodEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -59,6 +59,14 @@ abstract class MySpendDatabase : RoomDatabase() {
                 db.execSQL("UPDATE categories SET necessity = 'SEMI_NECESSITY' WHERE name IN ('Home Maintenance', 'Professional', 'Health & Medical', 'Health', 'Education')")
                 db.execSQL("UPDATE categories SET necessity = 'SAVINGS' WHERE name IN ('Savings')")
                 db.execSQL("UPDATE categories SET necessity = 'NOT_NECESSARY' WHERE name IN ('Gifts & Celebrations', 'Charity', 'Shopping', 'Entertainment', 'Subscriptions', 'Travel', 'Personal', 'Others', 'Other')")
+            }
+        }
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "INSERT INTO categories (name, isDefault, necessity) SELECT 'Books', 1, 'SEMI_NECESSITY' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE LOWER(name) = 'books')"
+                )
             }
         }
     }

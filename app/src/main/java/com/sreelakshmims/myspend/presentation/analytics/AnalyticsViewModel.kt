@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import java.util.Calendar
 import javax.inject.Inject
+import com.sreelakshmims.myspend.util.CurrencyUtils
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -70,6 +71,23 @@ class AnalyticsViewModel @Inject constructor(
                     )
                 )
             }
+
+            val booksCategory = categories.find { it.categoryName.equals("Books", ignoreCase = true) }
+            val booksTotalPaise = booksCategory?.totalAmountPaise ?: 0L
+            val booksPercentage = if (total > 0) (booksTotalPaise.toFloat() / total * 100).toInt() else 0
+            val formattedBooksAmount = CurrencyUtils.formatPaiseToRupees(booksTotalPaise)
+
+            insights.add(
+                SpendingInsight(
+                    title = "Total Spent on Books: $formattedBooksAmount",
+                    description = if (booksTotalPaise > 0) {
+                        "Books account for $booksPercentage% of your total spending in this period."
+                    } else {
+                        "No spending recorded for Books in this period."
+                    },
+                    type = InsightType.CATEGORY
+                )
+            )
 
             if (prevTotal > 0) {
                 val diff = total - prevTotal

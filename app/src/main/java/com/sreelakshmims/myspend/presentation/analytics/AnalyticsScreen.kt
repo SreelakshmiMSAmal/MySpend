@@ -570,11 +570,12 @@ fun DonutChart(
 @Composable
 fun CategoryRowItem(summary: CategorySummary, total: Long) {
     val percentage = if (total > 0) (summary.totalAmountPaise.toFloat() / total * 100).toInt() else 0
+    val catStyle = getCategoryStyle(summary.categoryName)
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(modifier = Modifier.size(32.dp), shape = CircleShape, color = Color.Gray.copy(alpha = 0.1f)) {
-                    Icon(Icons.Default.Info, contentDescription = null, modifier = Modifier.padding(6.dp), tint = getCategoryStyle(summary.categoryName).color)
+                Surface(modifier = Modifier.size(32.dp), shape = CircleShape, color = Color.Black.copy(alpha = 0.1f)) {
+                    Icon(catStyle.icon, contentDescription = null, modifier = Modifier.padding(6.dp), tint = getCategoryStyle(summary.categoryName).color)
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(summary.categoryName, fontWeight = FontWeight.Medium)
@@ -587,7 +588,7 @@ fun CategoryRowItem(summary: CategorySummary, total: Long) {
         LinearProgressIndicator(
             progress = { percentage.toFloat() / 100f },
             modifier = Modifier.fillMaxWidth().height(4.dp).clip(CircleShape),
-            color = getCategoryStyle(summary.categoryName).color,
+            color = catStyle.color,
             trackColor = Color.LightGray.copy(alpha = 0.2f)
         )
     }

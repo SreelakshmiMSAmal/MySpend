@@ -34,6 +34,7 @@ fun getCategoryStyle(name: String): CategoryStyle = when (name.trim().lowercase(
     "professional"         -> CategoryStyle(Color(0xFF455A64), Icons.Default.Work)
     "fuel & vehicle"       -> CategoryStyle(Color(0xFFB71C1C), Icons.Default.LocalGasStation)
     "gifts & celebrations" -> CategoryStyle(Color(0xFFAB47BC), Icons.Default.CardGiftcard)
+    "books"                -> CategoryStyle(Color(0xFF8D6E63), Icons.Default.Book)
     "others"               -> CategoryStyle(Color(0xFF78909C), Icons.Default.MoreHoriz)
     else                   -> DefaultCategoryStyle
 }

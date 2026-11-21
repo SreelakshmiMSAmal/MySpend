@@ -38,7 +38,11 @@ object DatabaseModule {
             MySpendDatabase::class.java,
             MySpendDatabase.DATABASE_NAME
         )
-            .addMigrations(MySpendDatabase.MIGRATION_1_2, MySpendDatabase.MIGRATION_2_3)
+            .addMigrations(
+                MySpendDatabase.MIGRATION_1_2,
+                MySpendDatabase.MIGRATION_2_3,
+                MySpendDatabase.MIGRATION_3_4
+            )
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
@@ -74,6 +78,7 @@ object DatabaseModule {
             CategoryEntity(name = "Professional", necessity = NecessityLevel.SEMI_NECESSITY, isDefault = true),
             CategoryEntity(name = "Health", necessity = NecessityLevel.SEMI_NECESSITY, isDefault = true),
             CategoryEntity(name = "Education", necessity = NecessityLevel.SEMI_NECESSITY, isDefault = true),
+            CategoryEntity(name = "Books", necessity = NecessityLevel.SEMI_NECESSITY, isDefault = true),
 
             // SAVINGS
             CategoryEntity(name = "Savings", necessity = NecessityLevel.SAVINGS, isDefault = true),
